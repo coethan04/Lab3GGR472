@@ -1,13 +1,6 @@
-/*--------------------------------------------------------------------
-GGR472 WEEK 6: JavaScript for Web Maps
-Using expressions to:
-    - filter data drawn in map layers
-    - define paint properties based on attribute data and zoom level
---------------------------------------------------------------------*/
-
 
 // Define access token
-mapboxgl.accessToken = '...'; //***ADD YOUR PUBLIC ACCESS TOKEN***
+mapboxgl.accessToken = 'pk.eyJ1IjoiY29ldGhhbiIsImEiOiJjbW04Mm9vNTAwem5hMnFwbXA3bm9sYzg1In0.FUDLFtuUAAp3eF1BSszV6g'; //***ADD YOUR PUBLIC ACCESS TOKEN***
 
 // Initialize map
 const map = new mapboxgl.Map({
@@ -18,34 +11,48 @@ const map = new mapboxgl.Map({
 });
 
 // Add zoom and rotation controls to the map.
-map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
 
 map.on('load', () => {
 
     // Add datasource from GeoJSON
-    map.addSource('toronto-mus', {
+    map.addSource('toronto-pt', {
         type: 'geojson',
-        data: 'https://raw.githubusercontent.com/smith-lg/ggr472-wk6-demo/main/data/torontomusicvenues.geojson'
+        data: 'https://raw.githubusercontent.com/coethan04/Lab3GGR472/refs/heads/main/map-4.geojson'
         //'https://smith-lg.github.io/ggr472-wk6-demo/data/torontomusicvenues.geojson'
     });
 
     // Draw GeoJSON points
     map.addLayer({
-        'id': 'toronto-mus-pnts',
+        'id': 'toronto-pt-pnts',
         'type': 'circle',
-        'source': 'toronto-mus',
+        'source': 'toronto-pt',
         'paint': {
-            'circle-radius': 5,
-            'circle-color': 'blue'
-        }
+            'circle-radius': [
+                'interpolate', //INTERPOLATE expression produces continuous results by interplating between value pairs
+                ['linear'], //linear interpolation between stops but could be exponential ['exponential', base] where base controls rate at which output increases
+                ['zoom'], //zoom expression changes appearance with zoom level
+                10, 5, // when zoom is 10 (or less), radius will be 5px
+                12, ['/', ['get', 'capacity'], 20] // when zoom is 12 (or greater), radius will be capacity/20
+            ],
+            'circle-color': [
+                'step', // STEP expression produces stepped results based on value pairs
+                ['get', 'capacity'], // GET expression retrieves property value from 'capacity' data field
+                '#800026', // Colour assigned to any values < first step
+                150, '#bd0026', // Colours assigned to values >= each step
+                500, '#e31a1c',
+                1000, '#fc4e2a',
+                2500, '#fd8d3c'
+            ]
+        },
     });
 
     // Draw GeoJSON labels using 'name' property
     map.addLayer({
-        'id': 'toronto-mus-labels',
+        'id': 'toronto-pt-labels',
         'type': 'symbol',
-        'source': 'toronto-mus',
+        'source': 'toronto-pt',
         'layout': {
             'text-field': ['get', 'name'],
             'text-variable-anchor': ['bottom'],
@@ -129,4 +136,49 @@ Maths expressions: /, *
 //     12, ['/',['get', 'capacity'],20] // when zoom is 12 (or greater), radius will be capacity/20
 // ]
 
+document.getElementById('returnbutton').addEventListener('click', () => {
+    map.flyTo({
+        center: [-95, 63],
+        zoom: 3,
+        essential: true
+    });
+});
 
+let legendcheck = document.getElementById('legendcheck');
+
+legendcheck.addEventListener('click', () => {
+    if (legendcheck.checked) {
+        legendcheck.checked = true;
+        legend.style.display = 'block';
+    }
+    else {
+        legend.style.display = "none";
+        legendcheck.checked = false;
+    }
+});
+
+document.getElementById('layercheck').addEventListener('change', (e) => {
+    map.setLayoutProperty(
+        'toronto-pt-pnts',
+        'visibility',
+        e.target.checked ? 'visible' : 'none'
+    );
+});
+
+/*--------------------------------------------------------------------
+ADD POP-UP ON CLICK EVENT
+--------------------------------------------------------------------*/
+map.on('mouseenter', 'toronto-pt-pnts', () => {
+    map.getCanvas().style.cursor = 'pointer'; // Switch cursor to pointer when mouse is over provterr-fill layer
+});
+
+map.on('mouseleave', 'toronto-pt-pnts', () => {
+    map.getCanvas().style.cursor = ''; // Switch cursor back when mouse leaves provterr-fill layer
+});
+
+map.on('click', 'toronto-pt-pnts', (e) => {
+    new mapboxgl.Popup() // Declare new popup object on each click
+        .setLngLat(e.lngLat) // Use method to set coordinates of popup based on mouse click location
+        .setHTML("Point Location Found!") // Use click event properties to write text for popup
+        .addTo(map); // Show popup on map
+})
