@@ -4,3 +4,80 @@
     bottom: 0;
     width: 100%;
 }
+
+.map-search-container {
+    position: absolute;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    background: rgba(255, 255, 255, 0.8);
+    top: 0;
+    left: 0;
+    margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px; /*around elements inside of overlay*/
+    border-radius: 8px;
+    overflow: visible;
+}
+
+.geocoder {
+    position: relative;
+    margin: 10px 0;
+}
+
+.legend {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.7);
+    bottom: 0;
+    right: 0;
+    margin: 0 10px 30px 0; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    max-width: 200px;
+}
+
+.legend h4 {
+    margin: 0 0 10px;
+}
+
+•legend-key {
+display: inline-block; 
+border-radius: 50%;
+/*curve border to make a circle*/ 
+height: 10px;
+/*size of circle*/ 
+width: 10px;
+margin-right: -5px;
+/*position of circle*/
+}
+
+.legend div {
+    margin-bottom: 5px;
+}
+
+.legend span {
+    display: inline-block;
+    border-radius: 50%; /*curve border to make a circle*/
+    height: 10px; /*size of circle*/
+    width: 10px;
+    margin-right: 5px; /*position of circle*/
+}
+
+/* Add colour to each child div in legend */
+.legend div:nth-child(2) span {
+    background-color: #fd8d3c; /* set background colour of span */
+}
+
+.legend div:nth-child(3) span {
+    background-color: #fc4e2a;
+}
+
+.legend div:nth-child(4) span {
+    background-color: #e31a1c;
+}
+
+.legend div:nth-child(5) span {
+    background-color: #bd0026;
+}
+
+.legend div:nth-child(6) span {
+    background-color: #800026;
+}
