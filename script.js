@@ -1,23 +1,19 @@
-/*--------------------------------------------------------------------
-GGR472 WEEK 8: JavaScript for Web Maps
-Adding elements to the map (map controls and basic legend)
---------------------------------------------------------------------*/
-
-/*--------------------------------------------------------------------
-INITIALIZE MAP
---------------------------------------------------------------------*/
-mapboxgl.accessToken = ''; //***ADD YOUR ACCESS TOKEN HERE***
+mapboxgl.accessToken = 'pk.eyJ1IjoiY29ldGhhbiIsImEiOiJjbW04Mm9vNTAwem5hMnFwbXA3bm9sYzg1In0.FUDLFtuUAAp3eF1BSszV6g'; //***ADD YOUR ACCESS TOKEN HERE***
 
 const map = new mapboxgl.Map({
     container: 'my-map',
-    style: 'mapbox://styles/mapbox/standard',
+    style: 'mapbox://styles/coethan/cmm9gnlfw001401s1ddxv60r3',
     config: {
         basemap: {
             theme: "monochrome"
         }
     },
-    center: [-95, 63],
+    center: [-105, 65],
     zoom: 3,
+    maxBounds: [
+        [140,0]
+        [25, 85]
+    ],
     minZoom: 3
 });
 
@@ -32,11 +28,11 @@ map.addControl(
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl,
         countries: "ca" // Limit to Canada only
-    })
+    }), 'bottom-right'
 );
 
 // Add zoom and rotation controls to the top left of the map
-map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
 // Add fullscreen option to the map
 map.addControl(new mapboxgl.FullscreenControl());
@@ -51,14 +47,14 @@ and use css to position
 --------------------------------------------------------------------*/
 
 // Create geocoder as a variable (and remove previous geocoder)
-// const geocoder = new MapboxGeocoder({
-//     accessToken: mapboxgl.accessToken,
-//     mapboxgl: mapboxgl,
-//     countries: "ca" 
-// });
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    countries: "ca" 
+});
 
 // Append geocoder variable to goeocoder HTML div to position on page
-// document.getElementById('my-geocoder').appendChild(geocoder.onAdd(map));
+document.getElementById('my-geocoder').appendChild(geocoder.onAdd(map));
 
 
 
@@ -68,28 +64,28 @@ and use css to position
 // Same colours and threshold values are used in hardcoded legend
 // --------------------------------------------------------------------*/
 // Add data source and draw initial visiualization of layer
-// map.on('load', () => {
-//     map.addSource('provterr-data', {
-//         'type': 'geojson',
-//         'data': 'https://raw.githubusercontent.com/smith-lg/ggr472-wk8-demo1/refs/heads/main/data/can-provterr.geojson'
-//     });
+map.on('load', () => {
+    map.addSource('country-data', {
+        'type': 'geojson',
+        'data': 'https://raw.githubusercontent.com/coethan04/Lab3GGR472/refs/heads/main/map-3.geojson'
+    });
 
-//     map.addLayer({
-//         'id': 'provterr-fill',
-//         'type': 'fill',
-//         'source': 'provterr-data',
-//         'paint': {
-//             'fill-color': [
-//                 'step', // STEP expression produces stepped results based on value pairs
-//                 ['get', 'POP2021'], // GET expression retrieves property value from 'capacity' data field
-//                 '#fd8d3c', // Colour assigned to any values < first step
-//                 100000, '#fc4e2a', // Colours assigned to values >= each step
-//                 500000, '#e31a1c',
-//                 1000000, '#bd0026',
-//                 5000000, '#800026'
-//             ],
-//             'fill-opacity': 0.5,
-//             'fill-outline-color': 'white'
-//         }
-//     });
-// });
+    map.addLayer({
+        'id': 'country-fill',
+        'type': 'fill',
+        'source': 'country-data',
+        'paint': {
+            'fill-color': [
+                'step', // STEP expression produces stepped results based on value pairs
+                ['get', 'POP2021'], // GET expression retrieves property value from 'capacity' data field
+                '#fd8d3c', // Colour assigned to any values < first step
+                100000, '#fc4e2a', // Colours assigned to values >= each step
+                500000, '#e31a1c',
+                1000000, '#bd0026',
+                5000000, '#800026'
+            ],
+            'fill-opacity': 0.5,
+            'fill-outline-color': 'white'
+        }
+    });
+});
